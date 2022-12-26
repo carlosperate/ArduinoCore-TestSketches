@@ -3,14 +3,18 @@
 #define I2C_PERIPHERAL_ADDRESS (0x90)
 
 void setup() {
-    Wire.begin();
+#if WIRE_HAS_END
     // Wire.end() should undo everything done by Wire.begin()
-    Wire.end();
-    // So calling Wire.begin() again should still work the same
-    // as not having done the two lines above
+    // So these two lines should have no effect on the following Wire.begin()
     Wire.begin();
-    Wire.setWireTimeout();
+    Wire.end();
+#endif
+    Wire.begin();
     Wire.setClock(400000);
+
+#if WIRE_HAS_TIMEOUT
+    Wire.setWireTimeout();
+#endif
 }
 
 void error() {
@@ -37,13 +41,13 @@ void loop() {
     // Read 32 bytes from a peripheral
     arrived_count = Wire.requestFrom(I2C_PERIPHERAL_ADDRESS, 32, false);
     if (arrived_count != 32) error();
+    uint8_t i = 0;
     while (Wire.available()) {
-        // These two should be the same value
-        data[0] = Wire.peek();
-        data[1] = Wire.read();
-        if (Wire.getWireTimeoutFlag()) {
-            Wire.clearWireTimeoutFlag();
-        }
+        uint8_t peeked = Wire.peek();
+        data[i] = Wire.read();
+        if (peeked != data[i]) error();
+        if (i >= 32) error();
+        i++;
     }
 
     // Again, but the default stop bits
@@ -54,4 +58,11 @@ void loop() {
     if (transmission_state != 0) error();
     arrived_count = Wire.requestFrom(I2C_PERIPHERAL_ADDRESS, 1);
     if (arrived_count != 1) error();
+
+#if WIRE_HAS_TIMEOUT
+    // Call the rest of the timeout methods
+    if (Wire.getWireTimeoutFlag()) {
+        Wire.clearWireTimeoutFlag();
+    }
+#endif
 }
