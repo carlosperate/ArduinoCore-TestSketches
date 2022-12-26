@@ -3,19 +3,22 @@
 #define I2C_PERIPHERAL_ADDRESS (0x90)
 
 void setup() {
-    Wire.begin();
+#if WIRE_HAS_END
     // Wire.end() should undo everything done by Wire.begin()
+    // So these two lines should have no effect on the following Wire.begin()
+    Wire.begin();
     Wire.end();
-    // So calling Wire.begin() again should still work the same
-    // as not having done the two lines above
+#endif
     Wire.begin(I2C_PERIPHERAL_ADDRESS);
-    Wire.setWireTimeout();
+    Wire.onReceive(peripheralReceiveHandler);
+    Wire.onRequest(peripheralSendHandler);
 
     // Should this work in peripheral mode???
     Wire.setClock(400000);
 
-    Wire.onReceive(peripheralReceiveHandler);
-    Wire.onRequest(peripheralSendHandler);
+#if WIRE_HAS_TIMEOUT
+    Wire.setWireTimeout();
+#endif
 }
 
 void error() {
@@ -23,16 +26,17 @@ void error() {
 }
 
 void peripheralReceiveHandler(int count) {
-    uint8_t data[32] = {0};
-    while (Wire.available()) {
-        // These two should be the same value
-        data[0] = Wire.peek();
-        data[1] = Wire.read();
-        if (Wire.getWireTimeoutFlag()) {
-            Wire.clearWireTimeoutFlag();
-        }
-    }
+    if (count >= 32)  error();
 
+    uint8_t data[32] = {0};
+    uint8_t i = 0;
+    while (Wire.available()) {
+        uint8_t peeked = Wire.peek();
+        data[i] = Wire.read();
+        if (peeked != data[i]) error();
+        if (i >= count) error();
+        i++;
+    }
 }
 
 void peripheralSendHandler() {
@@ -48,24 +52,11 @@ void peripheralSendHandler() {
 }
 
 void loop() {
-    size_t arrived_count = 0;
-    uint8_t transmission_state = 0;
-    uint8_t data[32] = {0x02, 0x03};
+#if WIRE_HAS_TIMEOUT
+    if (Wire.getWireTimeoutFlag()) {
+        Wire.clearWireTimeoutFlag();
+    }
+#endif
 
-    transmission_state = Wire.endTransmission(false);
-    if (transmission_state != 0) error();
-
-    // Read 32 bytes from a peripheral
-    arrived_count = Wire.requestFrom(I2C_PERIPHERAL_ADDRESS, 32, false);
-    if (arrived_count != 32) error();
-
-
-    // Again, but the default stop bits
-    Wire.beginTransmission(I2C_PERIPHERAL_ADDRESS);
-    sent_count = Wire.write(data, 32);
-    if (sent_count != 32) error();
-    transmission_state = Wire.endTransmission();
-    if (transmission_state != 0) error();
-    arrived_count = Wire.requestFrom(I2C_PERIPHERAL_ADDRESS, 1);
-    if (arrived_count != 1) error();
+    delay(50);
 }
