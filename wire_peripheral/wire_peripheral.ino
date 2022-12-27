@@ -26,7 +26,7 @@ void error() {
 }
 
 void peripheralReceiveHandler(int count) {
-    if (count >= 32)  error();
+    if (count >= 32) error();
 
     uint8_t data[32] = {0};
     uint8_t i = 0;
