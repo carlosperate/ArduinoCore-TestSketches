@@ -1,3 +1,18 @@
+/**
+ * Example trying to exercise all the Wire API for the I2C/TWI controller mode.
+ *
+ * This example code is not really designed to work with any specific I2C
+ * controller, it only exercises all relevant the methods, so it's a good check
+ * to see if your Arduino Core compiles all the features.
+ *
+ * There are two Wire features that indicate their availability via macros:
+ *   - WIRE_HAS_END -> Wire.end()
+ *   - WIRE_HAS_TIMEOUT -> Wire.setWireTimeout(), Wire.getWireTimeoutFlag(),
+ *                         Wire.clearWireTimeoutFlag()
+ *
+ * TODO: This could be updated, together with the wire_controller sketch so
+ *       that they work together connecting two Arduino boards.
+ */
 #include <Wire.h>
 
 #define I2C_PERIPHERAL_ADDRESS (0x90)

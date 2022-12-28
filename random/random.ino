@@ -12,7 +12,7 @@ void setup() {
     }
 
     randomSeed(analogRead(0));
-    Serial.println("\nThese should be different on every run, as they are 'randomly' seeded:");
+    Serial.println("\nShould be different on every run, as they are 'randomly' seeded:");
     for (int i = 0; i < ARRAY_SIZE; i++) {
         Serial.println(random(256));
     }
@@ -30,7 +30,7 @@ void setup() {
     }
 
     // Print both arrays side to side
-    Serial.println("\nAnd the following pairs of values should always be the same to each other:");
+    Serial.println("\nThe following pairs should always be the same to each other:");
     for (int i = 0; i < ARRAY_SIZE; i++) {
         Serial.print(array_first[i]);
         Serial.print(", ");
