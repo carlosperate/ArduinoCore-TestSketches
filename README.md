@@ -1,21 +1,39 @@
 # ArduinoCore-TestSketches
 
 The goal of this repository is to contain a collection of Arduino Sketches that
-covers all the Arduino API, as a way to test an Arduino Core under development.
+cover all of the Arduino API, as a way to test an Arduino Core under development.
 
 The aim of these examples is not to verify the sketch code is working
-correctly, but if everything compiles it ensures all the Arduino API has been
-correctly implemented in an Arduino Core (an Arduino Core is an Arduino port
-to a specific platform or board).
+correctly, but if everything compiles it would indicate all the Arduino API
+has been correctly implemented in an Arduino Core (an Arduino Core is an
+Arduino port to a specific platform or board).
 
-The Arduino IDE built-in examples covers a lot of the Arduino API, but not all
-of it, so the sketches here will aim to have full coverage.
+The Arduino IDE [built-in examples](https://github.com/arduino/arduino-examples)
+covers a lot of the Arduino API, but not all of it, so the sketches here will
+aim to have full coverage.
 
 ## Current status
 
 These examples are still under development, so there is still a work to do.
 
 Any PRs adding additional examples are welcomed.
+
+- [x] Digital read pin functions
+- [x] Digital write pin functions
+- [x] Analog read pin functions
+- [x] Analog write pin functions
+- [ ] Tone pin functions
+- [ ] Pulse pin functions
+- [ ] Shift functions
+- [ ] Delay() functions
+- [x] Random number generator functions
+- [ ] External interrupt functions
+- [ ] Serial class methods
+- [ ] SPI class methods
+- [x] I2C controller Wire methods
+- [x] I2C peripheral Wire methods
+- [ ] USB Keyboard
+- [ ] USB Mouse
 
 ## License
 
