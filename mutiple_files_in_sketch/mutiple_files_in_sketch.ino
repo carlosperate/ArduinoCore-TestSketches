@@ -11,8 +11,6 @@
  */
 #include "header_top_dir.hpp"
 
-int func_without_declaration(int numb);
-
 void setup() {
     Serial.begin(115200);
     while (!Serial) continue;
