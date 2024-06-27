@@ -18,10 +18,10 @@ These examples are still under development, so there is still a work to do.
 
 Any PRs adding additional examples are welcomed.
 
-- [x] Digital read pin functions
-- [x] Digital write pin functions
-- [x] Analog read pin functions
-- [x] Analog write pin functions
+- [ ] Digital read pin functions
+- [ ] Digital write pin functions
+- [ ] Analog read pin functions
+- [ ] Analog write pin functions
 - [ ] Tone pin functions
 - [ ] Pulse pin functions
 - [ ] Shift functions
@@ -29,7 +29,7 @@ Any PRs adding additional examples are welcomed.
 - [x] Random number generator functions
 - [ ] External interrupt functions
 - [ ] Serial class methods
-- [ ] SPI class methods
+- [x] SPI class methods
 - [x] I2C controller Wire methods
 - [x] I2C peripheral Wire methods
 - [ ] USB Keyboard
