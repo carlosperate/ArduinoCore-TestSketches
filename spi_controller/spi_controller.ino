@@ -7,15 +7,15 @@
  */
 #include <SPI.h>
 
-#define CHIPSELECT_PIN 1
+#define CHIPSELECT_PIN      1
 #define CHIPSELECT_INACTIVE HIGH
-#define CHIPSELECT_ACTIVE LOW
+#define CHIPSELECT_ACTIVE   LOW
 
 #if !defined(SPI_HAS_TRANSACTION)
-//#error "An Arduino Core SPI library must include the SPI_HAS_TRANSACTION methods and define."
+// #error "The SPI library must include the SPI_HAS_TRANSACTION define & methods."
 #endif
 
-void setup (void) {
+void setup(void) {
     pinMode(CHIPSELECT_PIN, OUTPUT);
     digitalWrite(CHIPSELECT_PIN, CHIPSELECT_INACTIVE);
 
@@ -33,9 +33,11 @@ void loop(void) {
     // Reading data
     SPI.beginTransaction(SPISettings(14000000, MSBFIRST, SPI_MODE0));
     digitalWrite(CHIPSELECT_PIN, CHIPSELECT_ACTIVE);
-    uint8_t received_byte = SPI.transfer(0);  // Only reading data so, don't care about sent value
+    // Only reading data so, don't care about sent value
+    uint8_t received_byte = SPI.transfer(0);
     (void)received_byte;
-    uint16_t received_twobytes = SPI.transfer(0);  // Only reading data so, don't care about sent value
+    // Only reading data so, don't care about sent value
+    uint16_t received_twobytes = SPI.transfer(0);
     (void)received_twobytes;
     uint8_t receive_buffer[4] = {0};
     SPI.transfer(receive_buffer, 4);  // Received data placed in buffer
@@ -47,7 +49,7 @@ void loop(void) {
     digitalWrite(CHIPSELECT_PIN, CHIPSELECT_ACTIVE);
     SPI.transfer(0xAA);
     SPI.transfer16(0x55AA);
-    uint8_t data_to_send[4] = {0,1,2,3};
+    uint8_t data_to_send[4] = {0, 1, 2, 3};
     SPI.transfer(data_to_send, 4);
     digitalWrite(CHIPSELECT_PIN, CHIPSELECT_INACTIVE);
     SPI.endTransaction();

@@ -10,17 +10,24 @@
  *   - WIRE_HAS_TIMEOUT -> Wire.setWireTimeout(), Wire.getWireTimeoutFlag(),
  *                         Wire.clearWireTimeoutFlag()
  *
- * TODO: This could be updated, together with the wire_controller sketch so
+ * TODO: This could be updated, together with the wire_peripheral sketch so
  *       that they work together connecting two Arduino boards.
  */
 #include <Wire.h>
 
 #define I2C_PERIPHERAL_ADDRESS (0x90)
 
+#if !defined(WIRE_HAS_END)
+#warning "Modern Arduino Cores should implement the WIRE_HAS_END methods."
+#endif
+#if !defined(WIRE_HAS_TIMEOUT)
+#warning "Modern Arduino Cores should implement the WIRE_HAS_TIMEOUT methods."
+#endif
+
 void setup() {
 #if WIRE_HAS_END
-    // Wire.end() should undo everything done by Wire.begin()
-    // So these two lines should have no effect on the following Wire.begin()
+    // The Wire.end() call should undo everything done by Wire.begin(), so
+    // these two lines should cancel each other before the second Wire.begin()
     Wire.begin();
     Wire.end();
 #endif
