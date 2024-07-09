@@ -17,7 +17,6 @@ void error_beep_loop() {
 }
 
 void setup() {
-    uBit.audio.setVolume(0);
     // Human hearing range is 20 to 20K Hz
     for (int freq = 20; freq < 20000; freq += 10) {
         tone(TONE_PIN_1, freq);
