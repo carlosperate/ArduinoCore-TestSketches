@@ -5,7 +5,7 @@ cover all of the Arduino API, as a way to test an Arduino Core under development
 
 The aim of these examples is not to verify the sketch code is working
 correctly, but if everything compiles it would indicate all the Arduino API
-has been correctly implemented in an Arduino Core (an Arduino Core is an
+has been implemented in an Arduino Core (an Arduino Core is an
 Arduino port to a specific platform or board).
 
 The Arduino IDE [built-in examples](https://github.com/arduino/arduino-examples)
