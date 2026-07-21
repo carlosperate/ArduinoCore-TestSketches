@@ -4,7 +4,8 @@
  *   - checks the config/lifecycle API;
  *   - applies several begin() framing configs (8N1, 8N2, 8E1, 8O1, 7E1, 7O1);
  *   - prints each output-API value and asks you to confirm it looks right;
- *   - has you type known values so the Stream parsers can be checked;
+ *   - has you type known values so the Stream parsers/readers can be checked
+ *     (parseInt/Float, find, readBytes, readString, ...);
  *   - echoes what you type back, checking peek()==read() on every byte.
  * Any failed check prints a loud banner and halts, so nothing scrolls past it.
  *
@@ -48,6 +49,20 @@ void clearLine() {
     }
 }
 
+// Block until the line's terminator arrives, then swallow it, so a reader that
+// stopped early (on its target/count) still advances only once Enter is pressed,
+// like the parsers do. Handles whatever the terminal sends: \n, \r\n or \r.
+void drainToNewline() {
+    int c;
+    do {
+        c = Serial.read();
+    } while (c != '\n' && c != '\r');
+    delay(5);  // let a paired \r\n / \n\r partner arrive, then swallow it
+    while (Serial.peek() == '\n' || Serial.peek() == '\r') {
+        Serial.read();
+    }
+}
+
 // Ask the user whether the value just printed looks right, stops on first failure.
 void confirm(const char* label, const char* expected) {
     Serial.print("  <- do you see '");
@@ -86,6 +101,8 @@ void setup() {
     check(Serial.getTimeout() == 1234, "getTimeout() matches setTimeout()");
     Serial.flush();  // reaching the next line proves flush() did not panic
     check(true, "flush() returned");
+    Serial.print("  availableForWrite (core-specific) = ");
+    Serial.println(Serial.availableForWrite());
     Serial.end();
     Serial.begin(115200);
     check(Serial, "usable after end() + begin()");
@@ -175,6 +192,41 @@ void setup() {
     clearLine();
     Serial.println(w);
     check(w == "hello", "readStringUntil");
+
+    Serial.println("\n=== stream input (type each requested value) ===");
+    Serial.print("  type 'find': ");
+    waitForLine();
+    bool found = Serial.find("find");
+    drainToNewline();
+    Serial.println();
+    check(found, "find");
+    Serial.print("  type 'go': ");
+    waitForLine();
+    bool foundUntil = Serial.findUntil("go", "\n");
+    drainToNewline();
+    Serial.println();
+    check(foundUntil, "findUntil");
+    Serial.print("  type 'abcde': ");
+    waitForLine();
+    char buf[8] = {0};
+    size_t nBytes = Serial.readBytes(buf, 5);
+    drainToNewline();
+    Serial.println(buf);
+    check(nBytes == 5 && strcmp(buf, "abcde") == 0, "readBytes");
+    Serial.print("  type 'yes,': ");
+    waitForLine();
+    char buf2[8] = {0};
+    size_t nUntil = Serial.readBytesUntil(',', buf2, sizeof(buf2) - 1);
+    drainToNewline();
+    Serial.println(buf2);
+    check(nUntil == 3 && strcmp(buf2, "yes") == 0, "readBytesUntil");
+    Serial.print("  type 'done' (reads until idle, ~1s pause): ");
+    waitForLine();
+    String str = Serial.readString();  // no terminator: returns after setTimeout
+    str.trim();
+    clearLine();
+    Serial.println(str);
+    check(str == "done", "readString");
 
     Serial.println("\n  -> all checks passed");
 
