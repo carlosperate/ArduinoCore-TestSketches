@@ -52,11 +52,16 @@ void clearLine() {
 // Block until the line's terminator arrives, then swallow it, so a reader that
 // stopped early (on its target/count) still advances only once Enter is pressed,
 // like the parsers do. Handles whatever the terminal sends: \n, \r\n or \r.
+// If no terminator arrives within the Serial timeout, give up so the sketch
+// does not hang when the monitor is set to "No line ending".
 void drainToNewline() {
-    int c;
-    do {
-        c = Serial.read();
-    } while (c != '\n' && c != '\r');
+    int c = -1;
+    unsigned long deadline = millis() + Serial.getTimeout();
+    while (c != '\n' && c != '\r' && millis() < deadline) {
+        if (Serial.available() > 0) {
+            c = Serial.read();
+        }
+    }
     delay(5);  // let a paired \r\n / \n\r partner arrive, then swallow it
     while (Serial.peek() == '\n' || Serial.peek() == '\r') {
         Serial.read();
@@ -94,7 +99,11 @@ void setup() {
             "\nSerial API test will require user input, press any key to start...");
         delay(1500);
     }
+    check(Serial.available() > 0, "available() > 0 after key press");
     clearLine();
+    check(Serial.available() == 0, "available() == 0 after clearLine()");
+    check(Serial.peek() == -1, "peek() returns -1 when buffer empty");
+    check(Serial.read() == -1, "read() returns -1 when buffer empty");
 
     Serial.println("\n=== config / lifecycle ===");
     check(Serial, "bool operator true after begin()");
@@ -142,6 +151,9 @@ void setup() {
     Serial.print("  cstr write: ");
     Serial.write("cstr");
     confirm("cstr write", "cstr");
+    Serial.print("  byte value write: ");
+    Serial.write(65);
+    confirm("byte value write", "A");
     Serial.print("  print char: ");
     Serial.print('c');
     confirm("print char", "c");
@@ -172,6 +184,9 @@ void setup() {
     Serial.print(' ');
     Serial.print(255, BIN);
     confirm("number bases", "255 FF 377 11111111");
+    Serial.print("  println: ");
+    Serial.println("line");
+    confirm("println", "line");
 
     Serial.println("\n=== parsers (type each requested value) ===");
     Serial.print("  type the number 42: ");
@@ -180,6 +195,12 @@ void setup() {
     clearLine();
     Serial.println(n);
     check(n == 42, "parseInt");
+    Serial.print("  type 'x99' (parseInt should skip the x): ");
+    waitForLine();
+    long nSkip = Serial.parseInt(SKIP_ALL);
+    clearLine();
+    Serial.println(nSkip);
+    check(nSkip == 99, "parseInt(SKIP_ALL)");
     Serial.print("  type the number 3.5: ");
     waitForLine();
     float f = Serial.parseFloat();
@@ -201,6 +222,12 @@ void setup() {
     drainToNewline();
     Serial.println();
     check(found, "find");
+    Serial.print("  type 'find' again: ");
+    waitForLine();
+    bool foundLen = Serial.find("find", 4);
+    drainToNewline();
+    Serial.println();
+    check(foundLen, "find(target, length)");
     Serial.print("  type 'go': ");
     waitForLine();
     bool foundUntil = Serial.findUntil("go", "\n");
@@ -221,7 +248,7 @@ void setup() {
     drainToNewline();
     Serial.println(buf2);
     check(nUntil == 3 && strcmp(buf2, "yes") == 0, "readBytesUntil");
-    Serial.print("  type 'done' (reads until idle, ~1s pause): ");
+    Serial.print("  type 'done' (reads until idle, ~setTimeout pause): ");
     waitForLine();
     String str = Serial.readString();  // no terminator: returns after setTimeout
     str.trim();
@@ -231,7 +258,7 @@ void setup() {
 
     Serial.println("\n  -> all checks passed");
 
-    Serial.println("\n=== echo (type anything) ===");
+    Serial.println("\n=== echo (anything you type should be echoed back) ===");
 }
 
 void loop() {
