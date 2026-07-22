@@ -90,7 +90,8 @@ void setup() {
     // Reprint until the user reacts, so the results below aren't missed when the
     // monitor is opened after boot.
     while (Serial.available() == 0) {
-        Serial.println("\nSerial API test will require user input, press any key to start...");
+        Serial.println(
+            "\nSerial API test will require user input, press any key to start...");
         delay(1500);
     }
     clearLine();
@@ -113,20 +114,20 @@ void setup() {
     // apply each config (confirming begin() accepts it), then restore 8N1 before
     // printing the result.
     const uint16_t configs[] = {
-        SERIAL_5N1, SERIAL_6N1, SERIAL_7N1, SERIAL_8N1,
-        SERIAL_5N2, SERIAL_6N2, SERIAL_7N2, SERIAL_8N2,
-        SERIAL_5E1, SERIAL_6E1, SERIAL_7E1, SERIAL_8E1,
-        SERIAL_5E2, SERIAL_6E2, SERIAL_7E2, SERIAL_8E2,
-        SERIAL_5O1, SERIAL_6O1, SERIAL_7O1, SERIAL_8O1,
-        SERIAL_5O2, SERIAL_6O2, SERIAL_7O2, SERIAL_8O2
+        SERIAL_5N1, SERIAL_6N1, SERIAL_7N1, SERIAL_8N1, SERIAL_5N2, SERIAL_6N2,
+        SERIAL_7N2, SERIAL_8N2, SERIAL_5E1, SERIAL_6E1, SERIAL_7E1, SERIAL_8E1,
+        SERIAL_5E2, SERIAL_6E2, SERIAL_7E2, SERIAL_8E2, SERIAL_5O1, SERIAL_6O1,
+        SERIAL_7O1, SERIAL_8O1, SERIAL_5O2, SERIAL_6O2, SERIAL_7O2, SERIAL_8O2,
     };
     for (unsigned i = 0; i < sizeof(configs) / sizeof(configs[0]); i++) {
         Serial.begin(115200, configs[i]);
     }
     Serial.begin(115200);  // restore default config
-    Serial.println("  applied variants:\n    5N1 6N1 7N1 8N1 5N2 6N2 7N2 8N2"
-                   "\n    5E1 6E1 7E1 8E1 5E2 6E2 7E2 8E2"
-                   "\n    5O1 6O1 7O1 8O1 5O2 6O2 7O2 8O2");
+    Serial.println(
+        "  applied variants:\n"
+        "    5N1 6N1 7N1 8N1 5N2 6N2 7N2 8N2\n"
+        "    5E1 6E1 7E1 8E1 5E2 6E2 7E2 8E2\n"
+        "    5O1 6O1 7O1 8O1 5O2 6O2 7O2 8O2");
 #else
     Serial.println("  skipped (TEST_SERIAL_CONFIGS=0)");
 #endif

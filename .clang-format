@@ -8,3 +8,4 @@ AllowShortCaseLabelsOnASingleLine: true
 DerivePointerAlignment: true
 IncludeBlocks: Preserve
 AlignConsecutiveMacros: Consecutive
+AllowShortLoopsOnASingleLine: true
