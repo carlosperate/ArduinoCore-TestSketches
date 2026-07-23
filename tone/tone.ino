@@ -10,9 +10,9 @@
 void error_beep_loop() {
     while (true) {
         tone(TONE_PIN_1, 440);
-        uBit.sleep(100);
+        delay(100);
         noTone(TONE_PIN_1);
-        uBit.sleep(900);
+        delay(900);
     }
 }
 
