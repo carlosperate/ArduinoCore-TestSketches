@@ -1,0 +1,39 @@
+name: Compile Sketches
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  compile:
+    name: ${{ matrix.fqbn }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - fqbn: arduino:avr:uno              # AVR,
+          - fqbn: arduino:samd:mkrzero         # SAMD21
+          - fqbn: arduino:renesas_uno:minima   # Renesas RA4M1
+          - fqbn: arduino:mbed_nano:nano33ble  # nRF52840 mbedOS
+          # Zephyr v0.56.0 fails the serial due to Serial.write() bug
+          # https://github.com/arduino/ArduinoCore-zephyr/issues/555
+          - fqbn: arduino:zephyr_main:nano33ble  # nRF52840 Zephyr (Beta)
+            beta: true
+    # BETA cores are tracked but must not fail the CI, could be a Core bug.
+    continue-on-error: ${{ matrix.beta || false }}
+    steps:
+      - name: Checkout sketches
+        uses: actions/checkout@v7
+      - name: Compile all sketches
+        uses: arduino/compile-sketches@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          fqbn: ${{ matrix.fqbn }}
+          # Required by the external_library sketch
+          libraries: |
+            - name: SparkFun TMP102 Breakout
+          sketch-paths: |
+            - ./
+          verbose: true
